@@ -412,6 +412,7 @@ def add_image_uris_to_data(
     """
     if image:
         uri = build_absolute_uri(os.path.join(settings.MEDIA_URL, image))
+        print(uri)
         if header in result_data[pk]:
             result_data[pk][header].add(uri)
         else:
