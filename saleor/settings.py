@@ -63,9 +63,28 @@ ALLOWED_CLIENT_HOSTS = ["*"]  # get_list(ALLOWED_CLIENT_HOSTS)
 
 INTERNAL_IPS = get_list(os.environ.get("INTERNAL_IPS", "127.0.0.1"))
 
+DATABASE = {
+    "username": os.environ.get("DATABASE_USERNAME"),
+    "password": os.environ.get("DATABASE_USERNAME"),
+    "host": os.environ.get("DATABASE_HOST"),
+    "name": os.environ.get("DATABASE_NAME")
+}
+
+for key, val in DATABASE.items():
+    if val is None:
+        error = "Environment variable DATABASE_{} not found".format(key.upper())
+        raise ValueError(error)
+
+DATABASE_URL = "postgres://{}:{}@{}:5432/{}".format(
+    DATABASE["username"],
+    DATABASE["password"],
+    DATABASE["host"],
+    DATABASE["name"]
+)
+
 DATABASES = {
     "default": dj_database_url.config(
-        default="postgres://saleor:saleor@localhost:5432/saleor", conn_max_age=600
+        default="", conn_max_age=600
     )
 }
 
@@ -392,7 +411,7 @@ TEST_RUNNER = "saleor.tests.runner.PytestTestRunner"
 
 PLAYGROUND_ENABLED = get_bool_from_env("PLAYGROUND_ENABLED", True)
 
-ALLOWED_HOSTS = get_list(os.environ.get("ALLOWED_HOSTS", ".localhost, 127.0.0.1"))
+ALLOWED_HOSTS = get_list(os.environ.get("ALLOWED_HOSTS", "*"))
 ALLOWED_GRAPHQL_ORIGINS = get_list(os.environ.get("ALLOWED_GRAPHQL_ORIGINS", "*"))
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
