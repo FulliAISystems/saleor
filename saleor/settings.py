@@ -65,26 +65,29 @@ INTERNAL_IPS = get_list(os.environ.get("INTERNAL_IPS", "127.0.0.1"))
 
 DATABASE = {
     "username": os.environ.get("DATABASE_USERNAME"),
-    "password": os.environ.get("DATABASE_USERNAME"),
+    "password": os.environ.get("DATABASE_PASSWORD"),
     "host": os.environ.get("DATABASE_HOST"),
     "name": os.environ.get("DATABASE_NAME")
 }
 
+setDatabaseFromEnv = True
+
 for key, val in DATABASE.items():
     if val is None:
         error = "Environment variable DATABASE_{} not found".format(key.upper())
-        raise ValueError(error)
+        print(error)
+        setDatabaseFromEnv = False
 
 DATABASE_URL = "postgres://{}:{}@{}:5432/{}".format(
     DATABASE["username"],
     DATABASE["password"],
     DATABASE["host"],
     DATABASE["name"]
-)
+) if setDatabaseFromEnv else ""
 
 DATABASES = {
     "default": dj_database_url.config(
-        default="", conn_max_age=600
+        default=DATABASE_URL, conn_max_age=600
     )
 }
 
